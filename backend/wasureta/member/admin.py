@@ -22,5 +22,5 @@ class ActivationCodeInline(admin.StackedInline):
     extra=1
 
 # Add model to admin view
-admin.site.register(Member,MemberInline)
-admin.site.register(VerificationCode,ActivationCodeInline)
+admin.site.register(Member)
+admin.site.register(VerificationCode)

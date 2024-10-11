@@ -6,3 +6,9 @@ This is a fast prototype development to build my knowledge in Flutter frontend w
 Original from Notechondria. Wasureta in Japanese, means I forgot.
 
 This is a fontend app help people to build relationship between their home language and foreign language. With advancement of AI, it's still interesting to learn a new language. Isn't it? I guess?
+
+## Functionality
+
+### Convert csv to flashcards
+
+### Use AI prompt to hint user how to effectively remember the word

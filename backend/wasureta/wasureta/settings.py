@@ -41,6 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'debug_toolbar',
+    # app created
+    'jisho',
+    # 'member',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +56,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+# add trusted CDN
+CSRF_TRUSTED_ORIGINS = [f"http://localhost:{os.getenv('NGINX_PORT', 80)}"]
 
 ROOT_URLCONF = 'wasureta.urls'
 
@@ -71,10 +80,58 @@ TEMPLATES = [
     },
 ]
 
+# Session settings
+# https://docs.djangoproject.com/en/3.2/ref/settings/#std-setting-SESSION_COOKIE_AGE
+# We set to at most 3 days
+SESSION_COOKIE_AGE=259200
+
 WSGI_APPLICATION = 'wasureta.wsgi.application'
 
+# Logging
+# https://docs.djangoproject.com/en/4.2/topics/logging/
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        # print level in console
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        # print level in log file
+        'file': {
+            # de-comment the line below for detailed (super detailed) debug in django
+            # 'level': 'DEBUG',
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            # if you need to store it outside of current project folder, remove the join base part.
+            'filename': os.path.join(BASE_DIR,os.path.join("logs",f"{os.getenv('DJANGO_LOG_FILE_NAME', 'logs')}-{datetime.now().strftime('%Y%m%d')}.log")),
+            'formatter': 'verbose',
+            'encoding':'utf8',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': u'%(levelname)s [%(asctime)s] %(name)s.%(funcName)s:%(lineno)s- %(message)r',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+    # all the logging will propagate to root. so use root to save your log
+    'root': {
+        'handlers': ['file', ],
+        'level': 'DEBUG',
+    },
+}
 
 # Database
+# TODO: change database on dev
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
@@ -83,6 +140,18 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': os.getenv('POSTGRE_USERNAME'),
+#         'PASSWORD': os.getenv('POSTGRE_PASSWORD'),
+#         'HOST': "localhost" if DEBUG else os.getenv('POSTGRE_HOST'),
+#         'PORT': os.getenv('POSTGRE_PORT') # wrong! default port within the network is always 5432 for postgres
+#         # 'PORT': 5432
+#     }
+# }
 
 
 # Password validation
@@ -117,8 +186,32 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Automatic primary key for those who don't set, and the default feature name is id
+# https://docs.djangoproject.com/en/3.2/topics/db/models/#automatic-primary-key-fields
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+# static file in the project folder (global)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# this is the location where collect static will run, set it to the service directory of static url in production
+STATIC_ROOT = os.path.join(BASE_DIR, 'productionfiles/') if DEBUG else os.getenv('PRODUCTION_STATIC_ROOT')
+
+# Image files (jpg, jpeg)
+# reference: https://djangocentral.com/uploading-images-with-django/
+
+# Base url to serve media files
+MEDIA_URL = '/media/'
+
+# Path where media is stored
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') if DEBUG else os.getenv('PRODUCTION_MEDIA_ROOT')
+
+# login url
+LOGIN_URL="/login"
+
+# LOGIN_REDIRECT_URL="/profile"
