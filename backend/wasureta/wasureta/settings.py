@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     # app created
     'jisho',
-    # 'member',
+    'member',
 ]
 
 MIDDLEWARE = [

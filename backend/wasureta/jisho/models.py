@@ -5,6 +5,8 @@ import os
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from member.models import Member
+
 # from member.models import Member
 # Create your models here.
 
@@ -16,18 +18,18 @@ def Jisho_file_path(instance, filename):
     # return "profile_pic/user_{0}/{1}".format(instance.user.id, filename)
     # we save only one latest image.
     _name, _extension = os.path.splitext(filename)
-    return "user_upload/user_{0}/jisho/csv_{1}.csv".format(instance.creator_id.user_id.id,instance.id)
+    return "user_upload/user_{0}/jisho/csv_{1}.csv".format(instance.owner_id.user_id.id,instance.id)
 
 
 class Jisho(models.Model):
     # This objects contains the username, password, first_name, last_name, and email of member.
-    # owner_id = models.ForeignKey(
-    #     Member,
-    #     on_delete=models.CASCADE,
-    #     null=False,
-    # )
+    owner_id = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        null=False,
+    )
     
-    csv_file = models.FileField(upload_to=Jisho_file_path,null=False)
+    csv_file = models.FileField(upload_to=Jisho_file_path,null=True)
     title = models.CharField(max_length=100, null=False)
     description = models.CharField(max_length=3000, null=True)
     sharing_id = models.CharField(max_length=36,unique=True,null=True)
@@ -35,9 +37,12 @@ class Jisho(models.Model):
     # last_use and date_created automatically created, for these field, create one time value to timezone.now()
     date_created=models.DateTimeField(auto_now_add=True,null=False)
 
+    def __str__(self):
+        return f"{self.title},owner_id:{self.owner_id.user_id.id},owner_name:{self.owner_id.user_id.get_full_name()}"
+
 class MemRecord(models.Model):
     """
-    This 
+    This class stores the record of the jisho
     """
     jisho_id = models.ForeignKey(
         Jisho,

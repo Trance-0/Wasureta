@@ -46,7 +46,7 @@ class Member(models.Model):
 
     def __str__(self):
         """for better list display"""
-        return f"{self.user_id.get_full_name()}"
+        return f"{self.user_id.get_full_name()},user_id:{self.user_id.id},username:{self.user_id.username}"
 
 class VerificationChoices(models.TextChoices):
     """User group choices, may be more efficient if use django internal group"""

@@ -20,9 +20,29 @@ class _CustomTestState extends State<CustomTest> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: const Center(
-        child: Text('CustomTest')
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: renderTestInfo()
+        ),
       ),
-    );  
+    );
+  }
+  
+  List<Widget> renderTestInfo() {
+    String title = widget.title;
+    List<Widget> testInfoWidgets = [
+      Text(title),
+      Form(
+        child: Column(
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Title'),
+            ),
+          ],
+        ),
+      ),
+    ];
+    return testInfoWidgets;
   }
 }

@@ -21,6 +21,16 @@ class _SingleTestState extends State<SingleTest> {
       body: const Center(
         child: Text('SingleTest')
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+        ],
+        currentIndex: 0,
+        onTap: (index) {},
+      ),
     );
   }
 }
