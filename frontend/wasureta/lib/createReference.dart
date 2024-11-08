@@ -8,8 +8,8 @@ import 'package:http_parser/http_parser.dart';
 import 'package:wasureta/components/testCard.dart';
 import 'package:mime/mime.dart';
 import 'dart:developer' as developer;
-// ignore: non_constant_identifier_names
-String BASE_URL = "http://localhost:7799";
+import 'components/models.dart';
+import 'components/settings.dart';
 
 class CreateReference extends StatefulWidget {
   const CreateReference({super.key});
@@ -23,8 +23,13 @@ class _CreateReferenceState extends State<CreateReference> {
   Widget? testCard;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     renderTestCard('Test', 'Test', true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add new word list'),
@@ -46,8 +51,11 @@ class _CreateReferenceState extends State<CreateReference> {
     );
   }
 
-  void renderTestCard(String s, String t, bool bool) {
-    testCard = TestCard(title: s, subtitle: t, lock: bool);
+  void renderTestCard(String s, String t, bool lock) {
+    setState(() {
+      testCard =
+          TestCard(jisho: Jisho(id: -1, title: s, description: t), lock: lock);
+    });
   }
 }
 
@@ -83,18 +91,29 @@ class _CreateReferenceFormState extends State<CreateReferenceForm> {
               return null;
             },
             onSaved: (String? value) {
-              _name = value!;
+              setState(() {
+                _name = value!;
+              });
             },
             onChanged: (String value) {
+              setState(() {
+                _name = value;
+                
+              });
               widget.renderTestCard(_name, _description, _isChecked);
             },
           ),
           TextFormField(
             decoration: const InputDecoration(labelText: 'Description'),
             onSaved: (String? value) {
-              _description = value!;
+              setState(() {
+                _description = value!;
+              });
             },
             onChanged: (String value) {
+              setState(() {
+                _description = value;
+              });
               widget.renderTestCard(_name, _description, _isChecked);
             },
           ),
@@ -102,41 +121,50 @@ class _CreateReferenceFormState extends State<CreateReferenceForm> {
             title: const Text('Is public'),
             value: _isChecked,
             onChanged: (bool? value) {
-              _isChecked = value!;
+              setState(() {
+                _isChecked = value!;
+              });
               widget.renderTestCard(_name, _description, _isChecked);
             },
           ),
-          ElevatedButton(
-            onPressed: () async {
-              FilePickerResult? result = await FilePicker.platform.pickFiles(
-                  type: FileType.custom,
-                  allowMultiple: false,
-                  allowedExtensions: ['csv'],
-                  withData: false,
-                  withReadStream: true);
-              // The result will be null, if the user aborted the dialog
-              if (result != null) {
-                _file = result.files.first;
-                developer.log(_file!.name);
-                // _filePath = _file?.path;
-              } else {
-                developer.log("No file selected");
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('No file selected')));
-                }
-              }
-            },
-            child: const Text('Pick a file'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
-                _submitForm(context);
-              }
-            },
-            child: const Text('Submit'),
+          const SizedBox(height: 10,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  FilePickerResult? result = await FilePicker.platform
+                      .pickFiles(
+                          type: FileType.custom,
+                          allowMultiple: false,
+                          allowedExtensions: ['csv'],
+                          withData: false,
+                          withReadStream: true);
+                  // The result will be null, if the user aborted the dialog
+                  if (result != null) {
+                    _file = result.files.first;
+                    developer.log(_file!.name);
+                    // _filePath = _file?.path;
+                  } else {
+                    developer.log("No file selected");
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('No file selected')));
+                    }
+                  }
+                },
+                child: const Text('Pick a file'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    _submitForm(context);
+                  }
+                },
+                child: const Text('Submit'),
+              ),
+            ],
           ),
         ],
       ),
@@ -145,10 +173,10 @@ class _CreateReferenceFormState extends State<CreateReferenceForm> {
 
   void _submitForm(context) async {
     // TODO: fix this to https for security
-    // temporary solution: 
+    // temporary solution:
     // run your project with --web-browser-option="--disable-web-security"
     // eg: flutter run -d chrome --web-browser-flag "--disable-web-security"
-    Uri uri = Uri.parse("$BASE_URL/jisho/create");
+    Uri uri = Uri.parse("${settings.BASE_URL}/jisho/create");
 
     var request = MultipartRequest("POST", uri);
     //add your fields here
@@ -171,7 +199,7 @@ class _CreateReferenceFormState extends State<CreateReferenceForm> {
         : "";
     request.fields["owner_id"] = "1";
     if (_file != null) {
-      // path is not available on web, 
+      // path is not available on web,
       // TODO: fix this
       // final filePath = _file?.path;
       const filePath = null;
@@ -188,8 +216,7 @@ class _CreateReferenceFormState extends State<CreateReferenceForm> {
       developer.log(_file!.size.toString());
       developer.log(contentType.toString());
       // developer.log(stream.toString());
-      var multipartFile = MultipartFile(
-          'csv_file', stream, _file!.size,
+      var multipartFile = MultipartFile('csv_file', stream, _file!.size,
           filename: _file?.name ?? "web_upload.csv",
           contentType: contentType ?? MediaType.parse("text/csv"));
       request.files.add(multipartFile);
@@ -206,7 +233,7 @@ class _CreateReferenceFormState extends State<CreateReferenceForm> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text(
-              'Failed to create reference, please contact the administrator')));
+                'Failed to create reference, please contact the administrator')));
       }
     }
   }

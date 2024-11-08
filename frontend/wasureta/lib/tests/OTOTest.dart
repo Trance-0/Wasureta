@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 
-class SingleTest extends StatefulWidget {
-  const SingleTest({Key? key}) : super(key: key);
+class OTOTest extends StatefulWidget {
+  const OTOTest({Key? key}) : super(key: key);
 
   @override
-  State<SingleTest> createState() => _SingleTestState();
+  State<OTOTest> createState() => _OTOTestState();
 }
 
-class _SingleTestState extends State<SingleTest> {
+class _OTOTestState extends State<OTOTest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SingleTest'),
+        title: const Text('OTOTest'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: const Center(
-        child: Text('SingleTest')
+        child: Text('OTOTest')
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [

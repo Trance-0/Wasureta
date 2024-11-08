@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../customTest.dart';
+import 'models.dart';
 
 class TestCard extends StatelessWidget {
-  const TestCard({Key? key, required this.title, required this.subtitle, required this.lock})
+  const TestCard({Key? key, required this.jisho, required this.lock})
       : super(key: key);
 
-  final String title;
-  final String subtitle;
-  
+  final Jisho jisho;
+
   final bool lock;
   @override
   Widget build(BuildContext context) {
@@ -19,8 +19,8 @@ class TestCard extends StatelessWidget {
             children: <Widget>[
               ListTile(
                 leading: const Icon(Icons.folder),
-                title: Text(title),
-                subtitle: Text(subtitle),
+                title: Text(jisho.title),
+                subtitle: Text(jisho.description ?? ""),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -32,7 +32,7 @@ class TestCard extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  const CustomTest(title: 'CustomTest')));
+                                  CustomTest(jisho: jisho)));
                       }
                     },
                     child: const Text('Start test'),
