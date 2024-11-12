@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:wasureta/components/models.dart';
 
 class OTOTest extends StatefulWidget {
-  const OTOTest({Key? key}) : super(key: key);
+  final MemRecord memRecord;
+
+  const OTOTest(this.memRecord, {super.key});
 
   @override
   State<OTOTest> createState() => _OTOTestState();

@@ -32,7 +32,7 @@ class TestCard extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  CustomTest(jisho: jisho)));
+                                  CustomTest(jisho)));
                       }
                     },
                     child: const Text('Start test'),
